@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import juejinNetty.IM.message.login.LoginRequestPacket;
 import juejinNetty.IM.message.login.LoginResponsePacket;
+import juejinNetty.IM.message.login.MessageRequestPacket;
+import juejinNetty.IM.message.login.MessageResponsePacket;
 import juejinNetty.IM.protocol.serializer.JSONSerializer;
 import juejinNetty.IM.protocol.serializer.Serializer;
 
@@ -20,7 +22,7 @@ import static juejinNetty.IM.message.login.LoginCommand.*;
  */
 public class PacketCodeC {
     //魔数
-    private static final int MAGIC_NUMBER = 0x12345678;
+    public static final int MAGIC_NUMBER = 0x12345678;
     private static final Map<Byte, Class<? extends Packet>> packetTypeMap;
     private static final Map<Byte, Serializer> serializerMap;
     public static final PacketCodeC INSTANCE = new PacketCodeC();
@@ -29,21 +31,23 @@ public class PacketCodeC {
         packetTypeMap = new HashMap<>();
         packetTypeMap.put(LOGIN_REQUEST, LoginRequestPacket.class);
         packetTypeMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
-//        packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
-//        packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
+        packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
+        packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();
         serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
     }
 
+    private PacketCodeC() {
+    }
 
-    public ByteBuf encode(ByteBufAllocator byteBufAllocator, Packet packet) {
+    public ByteBuf encode(ByteBuf byteBuf, Packet packet) {
         // 1. 创建 ByteBuf 对象
         /*
         ioBuffer() 方法会返回适配 io 读写相关的内存，它会尽可能创建一个直接内存，
         直接内存可以理解为不受 jvm 堆管理的内存空间，写到 IO 缓冲区的效果更高。
          */
-        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
+//        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
         // 2. 序列化 java 对象
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 
@@ -100,6 +104,9 @@ public class PacketCodeC {
 
         return null;
     }
+
+
+
 
     private Serializer getSerializer(byte serializeAlgorithm) {
 
