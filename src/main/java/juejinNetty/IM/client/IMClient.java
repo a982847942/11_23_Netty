@@ -2,7 +2,6 @@ package juejinNetty.IM.client;
 
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,14 +10,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import juejinNetty.IM.message.PacketCodeC;
-import juejinNetty.IM.message.PacketDecoder;
-import juejinNetty.IM.message.PacketEncoder;
-import juejinNetty.IM.message.Spliter;
-import juejinNetty.IM.message.login.MessageRequestPacket;
-import juejinNetty.IM.message.login.handler.LoginResponseHandler;
-import juejinNetty.IM.message.login.handler.MessageResponseHandler;
-import juejinNetty.IM.util.LoginUtil;
+import juejinNetty.IM.client.console.ConsoleCommandManager;
+import juejinNetty.IM.client.console.LoginConsoleCommand;
+import juejinNetty.IM.handler.Spliter;
+import juejinNetty.IM.handler.message.group.*;
+import juejinNetty.IM.handler.login.LoginResponseHandler;
+import juejinNetty.IM.handler.message.ptop.MessageResponseHandler;
+import juejinNetty.IM.packet.PacketDecoder;
+import juejinNetty.IM.packet.PacketEncoder;
+import juejinNetty.IM.util.SessionUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,6 +57,11 @@ public class IMClient {
                         ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginResponseHandler());
                         ch.pipeline().addLast(new MessageResponseHandler());
+                        ch.pipeline().addLast(new JoinGroupResponseHandler());
+                        ch.pipeline().addLast(new QuitGroupResponseHandler());
+                        ch.pipeline().addLast(new ListGroupMembersResponseHandler());
+                        ch.pipeline().addLast(new SendToGroupResponseHandler());
+                        ch.pipeline().addLast(new CreateGroupResponseHandler());
                         ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
@@ -86,22 +91,59 @@ public class IMClient {
             }
         });
     }
-    private static void startConsoleThread(Channel channel) {
-        new Thread(()->{
-            while(!Thread.interrupted()){
-                if (LoginUtil.hasLogin(channel)){
-                    Scanner sc = new Scanner(System.in);
-                    System.out.println("请输入需要发送给的消息:");
-                    StringBuilder message = new StringBuilder();
-                    while(!sc.hasNext("#")){
-                        message.append(sc.next() + "\r\n");
-                    }
-                    MessageRequestPacket requestPacket = new MessageRequestPacket();
-                    requestPacket.setMessage(message.toString());
-//                    ByteBuf buf = PacketCodeC.INSTANCE.encode(channel.alloc(), requestPacket);
-                    channel.writeAndFlush(requestPacket);
-                }
+//    private static void startConsoleThread(Channel channel) {
+//        new Thread(()->{
+//            while(!Thread.interrupted()){
+//                Scanner sc = new Scanner(System.in);
+//                if (SessionUtil.hasLogin(channel)){
+//                    MessageRequestPacket requestPacket = new MessageRequestPacket();
+//                    System.out.print("请输入接收方ID:");
+//                    String toUserId = sc.next();
+//                    requestPacket.setToUserId(toUserId);
+//                    System.out.println("请输入需要发送给的消息:");
+//                    StringBuilder message = new StringBuilder();
+//                    while(!sc.hasNext("#")){
+//                        message.append(sc.nextLine() + "\r\n");
+//                    }
+//                    requestPacket.setMessage(message.toString());
+////                    ByteBuf buf = PacketCodeC.INSTANCE.encode(channel.alloc(), requestPacket);
+//                    channel.writeAndFlush(requestPacket);
+//                    waitForLoginResponse();
+//                }else {
+//                    LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+//                    System.out.print("输入用户名登录: ");
+//                    String username = sc.nextLine();
+//                    loginRequestPacket.setUserName(username);
+//                    // 密码使用默认的
+//                    loginRequestPacket.setPassword("pwd");
+//                    // 发送登录数据包
+//                    channel.writeAndFlush(loginRequestPacket);
+//                    waitForLoginResponse();
+//                }
+//            }
+//        }).start();
+//    }
+private static void startConsoleThread(Channel channel) {
+    ConsoleCommandManager consoleCommandManager = new ConsoleCommandManager();
+    LoginConsoleCommand loginConsoleCommand = new LoginConsoleCommand();
+    Scanner scanner = new Scanner(System.in);
+
+    new Thread(() -> {
+        while (!Thread.interrupted()) {
+            if (!SessionUtil.hasLogin(channel)) {
+                loginConsoleCommand.exec(scanner, channel);
+                while (!SessionUtil.hasLogin(channel));
+            } else {
+                consoleCommandManager.exec(scanner, channel);
             }
-        }).start();
+        }
+    }).start();
+}
+
+    private static void waitForLoginResponse() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+        }
     }
 }

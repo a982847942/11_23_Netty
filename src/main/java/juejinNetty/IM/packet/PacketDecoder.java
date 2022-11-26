@@ -1,8 +1,7 @@
-package juejinNetty.IM.message;
+package juejinNetty.IM.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;

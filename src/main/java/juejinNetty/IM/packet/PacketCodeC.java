@@ -1,18 +1,20 @@
-package juejinNetty.IM.message;
+package juejinNetty.IM.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import juejinNetty.IM.message.login.LoginRequestPacket;
-import juejinNetty.IM.message.login.LoginResponsePacket;
-import juejinNetty.IM.message.login.MessageRequestPacket;
-import juejinNetty.IM.message.login.MessageResponsePacket;
+import juejinNetty.IM.packet.login.LoginRequestPacket;
+import juejinNetty.IM.packet.login.LoginResponsePacket;
+import juejinNetty.IM.packet.logout.LogoutRequestPacket;
+import juejinNetty.IM.packet.logout.LogoutResponsePacket;
+import juejinNetty.IM.packet.message.group.*;
+import juejinNetty.IM.packet.message.ptop.MessageRequestPacket;
+import juejinNetty.IM.packet.message.ptop.MessageResponsePacket;
 import juejinNetty.IM.protocol.serializer.JSONSerializer;
 import juejinNetty.IM.protocol.serializer.Serializer;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static juejinNetty.IM.message.login.LoginCommand.*;
+import static juejinNetty.IM.packet.CommandNumber.*;
 
 /**
  * @Classname PacketCodeC
@@ -33,6 +35,18 @@ public class PacketCodeC {
         packetTypeMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
         packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
         packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
+        packetTypeMap.put(LOGOUT_REQUEST, LogoutRequestPacket.class);
+        packetTypeMap.put(LOGOUT_RESPONSE, LogoutResponsePacket.class);
+        packetTypeMap.put(CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
+        packetTypeMap.put(CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
+        packetTypeMap.put(JOIN_GROUP_REQUEST, JoinGroupRequestPacket.class);
+        packetTypeMap.put(JOIN_GROUP_RESPONSE, JoinGroupResponsePacket.class);
+        packetTypeMap.put(QUIT_GROUP_REQUEST, QuitGroupRequestPacket.class);
+        packetTypeMap.put(QUIT_GROUP_RESPONSE, QuitGroupResponsePacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_REQUEST, ListGroupMembersRequestPacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_RESPONSE, ListGroupMembersResponsePacket.class);
+        packetTypeMap.put(SENT_TO_GROUP_REQUEST,SendToGroupRequestPacket.class);
+        packetTypeMap.put(SENT_TO_GROUP_RESPONSE,SendToGroupResponsePacket.class);
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();
         serializerMap.put(serializer.getSerializerAlgorithm(), serializer);

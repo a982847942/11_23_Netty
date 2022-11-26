@@ -1,8 +1,9 @@
-package juejinNetty.IM.message;
+package juejinNetty.IM.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import juejinNetty.IM.packet.PacketCodeC;
 
 /**
  * @Classname Spliter
@@ -31,7 +32,6 @@ public class Spliter extends LengthFieldBasedFrameDecoder {
      */
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-        System.out.println("haha");
         if (in.getInt(in.readerIndex()) != PacketCodeC.MAGIC_NUMBER) {
             ctx.channel().close();
             return null;

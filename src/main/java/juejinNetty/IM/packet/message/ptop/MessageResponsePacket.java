@@ -1,6 +1,7 @@
-package juejinNetty.IM.message.login;
+package juejinNetty.IM.packet.message.ptop;
 
-import juejinNetty.IM.message.Packet;
+import juejinNetty.IM.packet.Packet;
+import juejinNetty.IM.packet.CommandNumber;
 import lombok.Data;
 
 /**
@@ -11,9 +12,11 @@ import lombok.Data;
  */
 @Data
 public class MessageResponsePacket extends Packet {
+    private String fromUserId;
+    private String fromUserName;
     private String message;
     @Override
     public Byte getCommand() {
-        return LoginCommand.MESSAGE_RESPONSE;
+        return CommandNumber.MESSAGE_RESPONSE;
     }
 }

@@ -6,11 +6,13 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import juejinNetty.IM.message.PacketDecoder;
-import juejinNetty.IM.message.PacketEncoder;
-import juejinNetty.IM.message.Spliter;
-import juejinNetty.IM.message.login.handler.LoginRequestHandler;
-import juejinNetty.IM.message.login.handler.MessageRequestHandler;
+import juejinNetty.IM.handler.message.group.*;
+import juejinNetty.IM.handler.AuthHandler;
+import juejinNetty.IM.packet.PacketDecoder;
+import juejinNetty.IM.packet.PacketEncoder;
+import juejinNetty.IM.handler.Spliter;
+import juejinNetty.IM.handler.login.LoginRequestHandler;
+import juejinNetty.IM.handler.message.ptop.MessageRequestHandler;
 
 import java.util.Date;
 
@@ -39,6 +41,12 @@ public class IMServer {
                         ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginRequestHandler());
+                        ch.pipeline().addLast(new AuthHandler());
+                        ch.pipeline().addLast(new CreateGroupRequestHandler());
+                        ch.pipeline().addLast(new JoinGroupRequestHandler());
+                        ch.pipeline().addLast(new QuitGroupRequestHandler());
+                        ch.pipeline().addLast(new ListGroupMembersRequestHandler());
+                        ch.pipeline().addLast(new SendToGroupRequestHandler());
                         ch.pipeline().addLast(new MessageRequestHandler());
                         ch.pipeline().addLast(new PacketEncoder());
                     }

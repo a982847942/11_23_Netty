@@ -1,9 +1,9 @@
-package juejinNetty.IM.message.login;
+package juejinNetty.IM.packet.login;
 
-import juejinNetty.IM.message.Packet;
+import juejinNetty.IM.packet.Packet;
 import lombok.Data;
 
-import static juejinNetty.IM.message.login.LoginCommand.LOGIN_REQUEST;
+import static juejinNetty.IM.packet.CommandNumber.LOGIN_REQUEST;
 
 /**
  * @Classname LoginRequestPacket
@@ -15,7 +15,7 @@ import static juejinNetty.IM.message.login.LoginCommand.LOGIN_REQUEST;
 public class LoginRequestPacket extends Packet {
     private String userId;
 
-    private String username;
+    private String userName;
 
     private String password;
 

@@ -1,4 +1,4 @@
-package juejinNetty.IM.message;
+package juejinNetty.IM.packet;
 
 import lombok.Data;
 
